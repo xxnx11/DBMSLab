@@ -1,0 +1,52 @@
+use dictionary
+
+db.books.insertMany([
+  { title: "love is infinite", description: "no require it", by: "john", url: "https:books.com", tags: "love", likes: 50000 },
+  { title: "life is a war", description: "Rules", by: "john", url: "https://example.com", tags: ["struggle", "fight"], likes: 50000 },
+  { title: "stars in path", description: "important", by: "gaurav", url: "https://example.com", tags: ["stars", "sky"], likes: 1000 },
+  { title: "learn python", description: "basics of python", by: "alice", url: "https://example.com", tags: ["programming", "python"], likes: 180 }
+]);
+
+
+db.books.aggregate([
+  { $match: { by: "john" } },
+  { $count: "total_number_of_books" }
+]);
+
+
+db.books.aggregate([
+  { $match: { by: "john" } },
+  { $group: {
+      _id: "$by",
+      minlikes: { $min: "$likes" },
+      maxlikes: { $max: "$likes" }
+  }}
+]);
+
+
+db.books.aggregate([
+  { $match: { by: "john" } },
+  { $group: {
+      _id: "$by",
+      avglikes: { $avg: "$likes" }
+  }}
+]);
+
+
+db.books.aggregate([
+  { $match: { by: "john" } },
+  { $sort: { title: 1 } },
+  { $group: {
+      _id: "$by",
+      firstbook: { $first: "$title" },
+      lastbook: { $last: "$title" }
+  }}
+]);
+
+
+db.books.createIndex({ by: 1 });
+
+
+db.books.find({ by: "john" });
+
+
