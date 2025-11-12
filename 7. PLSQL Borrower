@@ -1,0 +1,50 @@
+SQL> CREATE TABLE Borrower (
+        Roll_no INT PRIMARY KEY,
+        Name VARCHAR(50),
+        DateOfIssue DATE,
+        NameOfBook VARCHAR(100),
+        Status CHAR(1) CHECK (Status IN ('I', 'R'))
+    );
+
+SQL> CREATE TABLE Borrower (
+        Roll_no INT PRIMARY KEY,
+        Name VARCHAR(50),
+        DateOfIssue DATE,
+        NameOfBook VARCHAR(100),
+        Status CHAR(1) CHECK (Status IN ('I', 'R'))
+    );
+
+SQL> INSERT INTO Borrower VALUES (1, 'Asha Patil', TO_DATE('2025-10-10', 'YYYY-MM-DD'), 'Database System Concepts', 'I');
+
+SQL> INSERT INTO Borrower VALUES (2, 'Rahul Deshmukh', TO_DATE('2025-10-20', 'YYYY-MM-DD'), 'Let Us C', 'I');
+
+SQL> COMMIT;
+
+SQL> SET SERVEROUTPUT ON;
+
+SQL> DECLARE
+         v_roll  Borrower.Roll_no%TYPE := &Roll_no;
+         v_book  Borrower.NameOfBook%TYPE := '&Book_Name';
+         v_issue Borrower.DateOfIssue%TYPE;
+         v_days  NUMBER;
+         v_fine  NUMBER := 0;
+     BEGIN
+         SELECT DateOfIssue INTO v_issue
+         FROM Borrower
+         WHERE Roll_no = v_roll AND NameOfBook = v_book AND Status='I';
+         v_days := TRUNC(SYSDATE - v_issue);
+         IF v_days <= 15 THEN v_fine := 0;
+         ELSIF v_days <= 30 THEN v_fine := (v_days - 15)*5;
+         ELSE v_fine := (v_days - 30)*50 + 75;
+         END IF;
+         UPDATE Borrower SET Status='R'
+         WHERE Roll_no=v_roll AND NameOfBook=v_book;
+         IF v_fine > 0 THEN
+             INSERT INTO Fine VALUES(v_roll, SYSDATE, v_fine);
+         END IF;
+         DBMS_OUTPUT.PUT_LINE('Book Returned! Fine Rs.'||v_fine);
+     EXCEPTION
+         WHEN NO_DATA_FOUND THEN
+             DBMS_OUTPUT.PUT_LINE('No record found!');
+     END;
+     /
