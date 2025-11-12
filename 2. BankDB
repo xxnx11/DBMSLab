@@ -1,0 +1,70 @@
+mysql> Show databases;
+
+mysql> CREATE DATABASE BankDB;
+
+mysql> USE BankDB;
+
+mysql> CREATE TABLE Bank (
+        bank_id INT PRIMARY KEY,
+        bank_name VARCHAR(100) NOT NULL UNIQUE,
+        ho_address VARCHAR(150) NOT NULL,
+        contactno VARCHAR(15) CHECK (LENGTH(contactno) >= 10)
+     );
+
+mysql> CREATE TABLE Branch (
+         branch_id INT PRIMARY KEY,
+         bank_id INT NOT NULL,
+         branch_name VARCHAR(100) NOT NULL,
+         ifsc VARCHAR(20) UNIQUE NOT NULL,
+         city VARCHAR(50) NOT NULL,
+         state VARCHAR(50) NOT NULL,
+         pincode VARCHAR(10) CHECK (LENGTH(pincode) = 6),
+         CONSTRAINT fk_bank FOREIGN KEY (bank_id) REFERENCES Bank(bank_id)
+     );
+
+mysql> CREATE TABLE Customer (
+         customerid INT PRIMARY KEY,
+         fname VARCHAR(50) NOT NULL,
+         mname VARCHAR(50),
+         lname VARCHAR(50) NOT NULL,
+         gender CHAR(1) CHECK (gender IN ('M', 'F')),
+         dob DATE NOT NULL,
+         phone VARCHAR(15) UNIQUE NOT NULL,
+         create_on DATE DEFAULT (CURRENT_DATE)
+     );
+
+mysql> CREATE TABLE Account (
+         account_id INT PRIMARY KEY,
+         customer_id INT NOT NULL,
+         branch_id INT NOT NULL,
+         account_no VARCHAR(20) UNIQUE NOT NULL,
+         account_type VARCHAR(15) CHECK (account_type IN ('SAVING', 'CURRENT', 'FD')),
+         balance DECIMAL(15,2) CHECK (balance >= 0),
+         status VARCHAR(10) DEFAULT 'ACTIVE',
+         open_on DATE DEFAULT (CURRENT_DATE),
+         CONSTRAINT fk_customer FOREIGN KEY (customer_id) REFERENCES Customer(customerid),
+         CONSTRAINT fk_branch FOREIGN KEY (branch_id) REFERENCES Branch(branch_id)
+     );
+
+mysql> ALTER TABLE Customer
+      ADD email VARCHAR(120) UNIQUE;
+
+mysql> describe customer;
+
+mysql> ALTER TABLE Branch
+       MODIFY branch_name VARCHAR(120);
+
+mysql> describe branch;
+
+mysql> ALTER TABLE Account
+       RENAME TO CustomerAccount;
+
+mysql> describe CustomerAccount;
+
+mysql> ALTER TABLE Branch
+       RENAME COLUMN ifsc TO ifsc_code;
+
+mysql> describe branch;
+
+mysql> CREATE INDEX idx_branch_id
+     ON CustomerAccount(branch_id);
