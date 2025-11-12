@@ -41,8 +41,6 @@ mysql> CREATE VIEW CustomerAccountView AS
      JOIN
          Account a ON c.CustomerID = a.CustomerID;
 
-mysql> SELECT * FROM CustomerAccountView;
-
 mysql> CREATE INDEX idx_transaction_date
       ON Transaction (TransactionDate);
 
