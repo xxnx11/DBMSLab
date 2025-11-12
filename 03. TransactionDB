@@ -43,5 +43,3 @@ mysql> CREATE VIEW CustomerAccountView AS
 
 mysql> CREATE INDEX idx_transaction_date
       ON Transaction (TransactionDate);
-
-
