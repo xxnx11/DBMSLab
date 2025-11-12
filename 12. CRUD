@@ -1,0 +1,63 @@
+use library
+
+db.createCollection("books")
+
+db.books.insertMany([
+  { title: "mongodb", description: "database system", by: "john", url: "https://example.com/mongodb", tags: ["database", "nosql"], likes: 50 },
+  { title: "nosql overview", description: "nosql basics", by: "alice", url: "https://example.com/nosql", tags: ["database"], likes: 5 },
+  { title: "data structures", description: "important concepts", by: "rohit", url: "https://example.com/ds", tags: ["programming", "ds"], likes: 25 },
+  { title: "java guide", description: "object oriented concepts", by: "john", url: "https://example.com/java", tags: ["programming", "java"], likes: 15 },
+  { title: "python tips", description: "coding examples", by: "emma", url: "https://example.com/python", tags: ["python"], likes: 8 }
+])
+
+db.books.insertOne({
+  title: "learning databases",
+  description: "DB basics with examples",
+  by: "rahul",
+  url: "https://example.com/db",
+  tags: ["database", "sql", "nosql"],
+  likes: 30,
+  username: "db_user",
+  comments: "Very helpful for beginners"
+})
+
+
+db.books.find({ title: "mongodb" })
+
+
+db.books.find({
+  $or: [{ by: "john" }, { title: "mongodb" }]
+})
+
+
+db.books.find({
+  $and: [{ title: "mongodb" }, { by: "john" }]
+})
+
+
+db.books.find({ likes: { $gt: 10 } })
+
+
+db.books.find({
+  $and: [
+    { likes: { $gt: 100 } },
+    { $or: [{ title: "mongodb" }, { by: "john" }] }
+  ]
+})
+
+
+db.books.updateOne(
+  { title: "mongodb" },
+  { $set: { title: "mongodb overview" } }
+)
+
+db.books.deleteOne({ title: "nosql overview" })
+
+
+db.books.find({ by: "john" }).limit(2)
+
+
+db.books.find({ by: "john" }).skip(1).limit(1)
+
+db.books.find().sort({ title: 1 })
+
