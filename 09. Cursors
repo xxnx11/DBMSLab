@@ -1,0 +1,90 @@
+SQL> CREATE TABLE Student_Result (
+        stud_id NUMBER PRIMARY KEY,
+        name VARCHAR2(50),
+        dept VARCHAR2(30),
+        total_mark NUMBER(5)
+    );
+
+SQL> INSERT INTO Student_Result VALUES (1, 'Asha Patil', 'Computer', 980);
+
+SQL> INSERT INTO Student_Result VALUES (2, 'Rahul Deshmukh', 'IT', 890);
+
+SQL> INSERT INTO Student_Result VALUES (3, 'Sneha Joshi', 'ENTC', 750);
+
+SQL> INSERT INTO Student_Result VALUES (4, 'Vikas Kale', 'Computer', 990);
+
+SQL> COMMIT;
+
+SQL> SET SERVEROUTPUT ON;
+
+SQL> DECLARE
+        v_rows NUMBER;
+    BEGIN
+        INSERT INTO Student_Result VALUES (5, 'Priya Kulkarni', 'IT', 870);
+        v_rows := SQL%ROWCOUNT;
+        DBMS_OUTPUT.PUT_LINE(v_rows || ' row(s) inserted successfully.');
+    END;
+    /
+
+SQL> DECLARE
+        CURSOR c_student IS
+            SELECT name, total_mark FROM Student_Result;
+        v_name Student_Result.name%TYPE;
+        v_marks Student_Result.total_mark%TYPE;
+    BEGIN
+        OPEN c_student;
+        LOOP
+            FETCH c_student INTO v_name, v_marks;
+           EXIT WHEN c_student%NOTFOUND;
+           DBMS_OUTPUT.PUT_LINE('Name: ' || v_name || ', Total Marks: ' || v_marks);
+       END LOOP;
+       CLOSE c_student;
+   END;
+   /
+
+SQL> BEGIN
+        FOR rec IN (SELECT * FROM Student_Result) LOOP
+            DBMS_OUTPUT.PUT_LINE(
+                'ID: ' || rec.stud_id ||
+                ', Name: ' || rec.name ||
+                ', Dept: ' || rec.dept ||
+                ', Marks: ' || rec.total_mark
+            );
+        END LOOP;
+   END;
+   /
+
+SQL> DECLARE
+        CURSOR c_dept(p_dept VARCHAR2) IS
+            SELECT name, total_mark
+            FROM Student_Result
+            WHERE dept = p_dept;
+    BEGIN
+        DBMS_OUTPUT.PUT_LINE('--- Students from IT Department ---');
+        FOR rec IN c_dept('IT') LOOP
+            DBMS_OUTPUT.PUT_LINE('Name: ' || rec.name || ', Marks: ' || rec.total_mark);
+       END LOOP;
+       DBMS_OUTPUT.PUT_LINE('--- Students from Computer Department ---');
+       FOR rec IN c_dept('Computer') LOOP
+           DBMS_OUTPUT.PUT_LINE('Name: ' || rec.name || ', Marks: ' || rec.total_mark);
+       END LOOP;
+   END;
+   /
+
+SQL> DECLARE
+        CURSOR c_update IS
+            SELECT stud_id, total_mark
+            FROM Student_Result
+            WHERE total_mark < 900
+            FOR UPDATE;
+    BEGIN
+        FOR rec IN c_update LOOP
+            UPDATE Student_Result
+           SET total_mark = rec.total_mark + 50
+           WHERE CURRENT OF c_update;
+           DBMS_OUTPUT.PUT_LINE('Updated student ID: ' || rec.stud_id ||
+                                ' -> New Marks: ' || (rec.total_mark + 50));
+       END LOOP;
+       COMMIT;
+   END;
+   /
