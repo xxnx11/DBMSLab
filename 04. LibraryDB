@@ -73,8 +73,7 @@ mysql> SELECT m_name
          SELECT m_id
          FROM IssuedBooks
          WHERE b_id IN (
-             SELECT b_id FROM Books WHERE author LIKE '%Navathe%'
-         )
+             SELECT b_id FROM Books WHERE author LIKE '%Navathe%')
      );
 
 mysql> SELECT
