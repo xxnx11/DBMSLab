@@ -49,22 +49,14 @@ mysql> CREATE TABLE Account (
 mysql> ALTER TABLE Customer
       ADD email VARCHAR(120) UNIQUE;
 
-mysql> describe customer;
-
 mysql> ALTER TABLE Branch
        MODIFY branch_name VARCHAR(120);
-
-mysql> describe branch;
 
 mysql> ALTER TABLE Account
        RENAME TO CustomerAccount;
 
-mysql> describe CustomerAccount;
-
 mysql> ALTER TABLE Branch
        RENAME COLUMN ifsc TO ifsc_code;
-
-mysql> describe branch;
 
 mysql> CREATE INDEX idx_branch_id
      ON CustomerAccount(branch_id);
