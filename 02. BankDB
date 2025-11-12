@@ -60,3 +60,4 @@ mysql> ALTER TABLE Branch
 
 mysql> CREATE INDEX idx_branch_id
      ON CustomerAccount(branch_id);
+
