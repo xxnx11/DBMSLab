@@ -1,0 +1,63 @@
+SQL> CREATE TABLE Books (
+        AccNo INT PRIMARY KEY,
+        Title VARCHAR(100) NOT NULL,
+        Author VARCHAR(100),
+        Publisher VARCHAR(100),
+        Count INT CHECK (Count >= 0)
+    );
+
+SQL> CREATE TABLE Library_Audit (
+        AccNo INT,
+        Title VARCHAR(100),
+        Author VARCHAR(100),
+        Publisher VARCHAR(100),
+        Count INT,
+        Action_Type VARCHAR(20),
+        Action_Date DATE
+    );
+
+SQL> CREATE OR REPLACE TRIGGER trg_before_delete_books
+    BEFORE DELETE ON Books
+    FOR EACH ROW
+    BEGIN
+        INSERT INTO Library_Audit
+        VALUES (
+            :OLD.AccNo,
+            :OLD.Title,
+            :OLD.Author,
+           :OLD.Publisher,
+           :OLD.Count,
+           'DELETE',
+           SYSDATE
+       );
+   END;
+   /
+
+SQL> CREATE OR REPLACE TRIGGER trg_after_update_books
+    AFTER UPDATE ON Books
+    FOR EACH ROW
+    BEGIN
+        INSERT INTO Library_Audit
+        VALUES (
+            :NEW.AccNo,
+            :NEW.Title,
+            :NEW.Author,
+           :NEW.Publisher,
+           :NEW.Count,
+           'UPDATE',
+           SYSDATE
+       );
+   END;
+   /
+
+SQL> INSERT INTO Books VALUES (101, 'DBMS Concepts', 'Korth', 'McGraw Hill', 10);
+
+SQL> INSERT INTO Books VALUES (102, 'Let Us C', 'Yashwant Kanetkar', 'BPB', 5);
+
+SQL> INSERT INTO Books VALUES (103, 'Operating Systems', 'Silberschatz', 'Wiley', 7);
+
+SQL> UPDATE Books SET Count = 12 WHERE AccNo = 101;
+
+SQL> DELETE FROM Books WHERE AccNo = 102;
+
+SQL> SELECT * FROM Library_Audit;
