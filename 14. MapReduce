@@ -1,0 +1,71 @@
+use customers
+
+db.orders.insertMany([
+  { cus_id: "A1", amount: 400, status: "p" },
+  { cus_id: "B2", amount: 300, status: "d" },
+  { cus_id: "A1", amount: 200, status: "f" },
+  { cus_id: "C1", amount: 200, status: "f" },
+  { cus_id: "B1", amount: 700, status: "p" },
+  { cus_id: "B1", amount: 800, status: "p" }
+])
+
+
+var mapsum = function() {
+  if (this.status == "p") {
+    emit(this.cus_id, this.amount);
+  }
+};
+
+var reducesum = function(key, values) {
+  return Array.sum(values);
+};
+
+db.orders.mapReduce(mapsum, reducesum, { out: "outputsum" });
+db.outputsum.find();
+
+
+var mapavg = function() {
+  emit("avg", { sum: this.amount, count: 1 });
+};
+
+var reduceavg = function(key, values) {
+  var result = { sum: 0, count: 0 };
+  values.forEach(function(v) {
+    result.sum += v.sum;
+    result.count += v.count;
+  });
+  return result;
+};
+
+var finalizeavg = function(key, reducedVal) {
+  return reducedVal.sum / reducedVal.count;
+};
+
+db.orders.mapReduce(mapavg, reduceavg, { out: "outputavg", finalize: finalizeavg });
+db.outputavg.find();
+
+
+var mapmin = function() {
+  emit(this.cus_id, this.amount);
+};
+
+var reducemin = function(key, values) {
+  return Math.min.apply(Math, values);
+};
+
+db.orders.mapReduce(mapmin, reducemin, { out: "minoutput" });
+db.minoutput.find();
+
+
+var mapmax = function() {
+  if (this.status == "f") {
+    emit(this.cus_id, this.amount);
+  }
+};
+
+var reducemax = function(key, values) {
+  return Math.max.apply(Math, values);
+};
+
+db.orders.mapReduce(mapmax, reducemax, { out: "maxoutput" });
+db.maxoutput.find();
