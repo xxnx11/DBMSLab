@@ -80,5 +80,3 @@ mysql> SELECT
          m.m_name,
          (SELECT COUNT(*) FROM IssuedBooks i WHERE i.m_id = m.m_id) AS books_issued
      FROM Members m;
-
-
