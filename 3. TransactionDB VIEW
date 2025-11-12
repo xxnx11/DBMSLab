@@ -1,0 +1,49 @@
+mysql> show databases;
+
+mysql> CREATE DATABASE BankTransactionDB;
+
+mysql> USE BankTransactionDB;
+
+mysql> CREATE TABLE Customer (
+         CustomerID INT PRIMARY KEY,
+         Name VARCHAR(100) NOT NULL,
+         Address VARCHAR(150),
+         Phone VARCHAR(15) UNIQUE,
+         Email VARCHAR(100) UNIQUE
+     );
+
+mysql> CREATE TABLE Account (
+         AccountID INT PRIMARY KEY,
+         CustomerID INT NOT NULL,
+         AccountType VARCHAR(20) CHECK (AccountType IN ('Saving', 'Current', 'Fixed')),
+         Balance DECIMAL(15,2) CHECK (Balance >= 0),
+         CreatedDate DATE DEFAULT (CURRENT_DATE),
+         CONSTRAINT fk_customer FOREIGN KEY (CustomerID) REFERENCES Customer(CustomerID)
+     );
+
+
+mysql> CREATE TABLE Transaction (
+         TransactionID INT PRIMARY KEY,
+         AccountID INT NOT NULL,
+         TransactionType VARCHAR(10) CHECK (TransactionType IN ('Credit', 'Debit')),
+         Amount DECIMAL(15,2) CHECK (Amount > 0),
+         TransactionDate DATE DEFAULT (CURRENT_DATE),
+         CONSTRAINT fk_account FOREIGN KEY (AccountID) REFERENCES Account(AccountID)
+     );
+
+mysql> CREATE VIEW CustomerAccountView AS
+     SELECT
+         c.Name AS CustomerName,
+         a.AccountID,
+         a.Balance AS CurrentBalance
+     FROM
+         Customer c
+     JOIN
+         Account a ON c.CustomerID = a.CustomerID;
+
+mysql> SELECT * FROM CustomerAccountView;
+
+mysql> CREATE INDEX idx_transaction_date
+      ON Transaction (TransactionDate);
+
+
